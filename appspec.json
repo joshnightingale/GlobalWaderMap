@@ -25,10 +25,16 @@
   "dependencies": {
     "R": [
       {
-        "name": "lubridate"
+        "name": "sf"
       },
       {
-        "name": "move2"
+        "name": "dggridR"
+      },
+      {
+        "name": "plyr"
+      },
+      {
+        "name": "mapview"
       }
     ]
   },
@@ -38,6 +44,7 @@
       "from": "data/auxiliary/user-files/provided-app-files/auxiliary-file-a/sample.txt"
     }
   ],
+  "createsArtifacts": true,
   "license": {
     "key": "MIT"
   },
@@ -48,10 +55,10 @@
   ],
   "people": [
     {
-      "firstName": "Charles",
+      "firstName": "Josh",
       "middleInitials": null,
-      "lastName": "Darwin",
-      "email": "creator@example.com",
+      "lastName": "Nightingale",
+      "email": "",
       "roles": [
         "author",
         "creator"

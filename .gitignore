@@ -6,3 +6,6 @@
 data/output/**
 !data/output/.keep
 tests/testthat/plot.png
+RFunction_template.R
+
+*.html
