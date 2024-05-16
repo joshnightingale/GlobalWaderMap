@@ -7,125 +7,110 @@
 
 
 #### packages ####
+library(plyr)
+library(move2)
+library(magrittr)
 library(sf)
 library(dggridR)
-library(plyr)
 library(mapview)
 
 
-#### load shapefile ####
-# full data
-# dat_string <- "../../Movebank/Basic map/moveapps-shapefile/moveapps-shapefile.shp"
-
-## just wadertrack for testing
-dat_string <- "../../Movebank_experiments/moveapps-shapefilevgk and wadertrack/moveapps-shapefile.shp"
-
-## read
-dat <- st_read(dat_string)
-
-
-## set gridsize
-# roughly: 5 for testing; 6 for embed; 7 for hi-res
-gridsize <- 5
-
-# rFunction = function(dat, sdk, gridsize=5, ...) {
-  #### world map ####
+rFunction = function(gridsize, data) {
   
-  ### load saved file
-  world <- st_read("world.gpkg")
-  
-  ### how to generate and save (once)
-  # world <- ne_countries(scale = "medium", returnclass = "sf")
-  # write_sf(world, "world.gpkg")
+  #### load saved world map ####
+  world <- st_read(getAuxiliaryFilePath("map"))
   
   
-  #### make grid ####
-  
-  ## raw grid
+  #### make grid system ####
   # see https://github.com/r-barnes/dggridR for grid sizes etc.
-  # hex <- dgconstruct(res = 5) # huge cells for testing (~1500 km !)
-  # hex <- dgconstruct(res = 7) # about right for main view (~100 km)
-  hex <- dgconstruct(res = gridsize) # for embed
+  hex <- dgconstruct(res = gridsize) 
   
   
-  ## create cells covering shapefile
-  ## TODO - add code to save as shapefile
+  #### return hex cells ####
   
-  # using shapefile, res5 and wadertrack - 11.94468 secs
-  # using res7 and full data = 4.5 minutes
-  cells <- dgshptogrid(hex, dat_string)
+  ## needs shapefile of data extent
+  bbox_shp <- st_bbox(data) %>% st_as_sfc() # return
+  st_write(obj = bbox_shp, dsn = Sys.getenv(x = "APP_ARTIFACTS_DIR"), 
+           layer = "bbox.shp", driver = "ESRI Shapefile", append=F) # save
   
   
-  # fix edge of world wrapping
+  ## return cells
+  cells <- dgshptogrid(hex, appArtifactPath("bbox.shp"))
+  
+  
+  ## fix edge of world wrapping
   wrap_cells <- st_wrap_dateline(cells, options = c("WRAPDATELINE=YES","DATELINEOFFSET=180"), quiet = TRUE)
   
   
-  ### #Get the corresponding grid cells for each point
+  ## Get the corresponding grid cells for each point
+  coords <- st_coordinates(data)
+  data$seqnum <- dgGEO_to_SEQNUM(hex, coords[,1], coords[,2])$seqnum
   
-  # with res 5 and wadertrack = 0.09630871 secs
-  # with res 7 and full data, 5.65 secs
-  dat$seqnum <- dgGEO_to_SEQNUM(hex, dat$loc_long, dat$loc_lat)$seqnum
+  cat(str( subset(data, seqnum==data$seqnum[1])  ))
+  
+  #### summarise cell contents ####
+  # hex_sum <- ddply(data, .(seqnum), \(x) {
+  #   data.frame(
+  #     count=nrow(x),
+  #     Nind = length(unique(x$track_id))#,
+  #     # Nspp = length(unique(x$taxon_canonical_name))
+  #   ) %>% return()
+  # })
   
   
-  ### summarise by count
-  hex_sum <- ddply(dat, .(seqnum), \(x) {
-    data.frame(
-      count=nrow(x),
-      Nind = length(unique(x$anim_lo_id)),
-      Nspp = length(unique(x$taxon))
-    ) |> return
-  }, .progress = progress_time())
+  hex_sum <- data.frame(seqnum=unique(data$seqnum), 
+                        count=NA, Nind=NA, Nspp=NA)
+  for (ii in 1:nrow(hex_sum) ) {
+    data_sub <- subset(data, seqnum==hex_sum$seqnum[ii])
+    hex_sum$count[ii] <- nrow(data_sub)
+    hex_sum$Nind[ii] <- length(unique(attr(data_sub, "track_data")$individual_id))
+    hex_sum$Nspp[ii] <- length(unique(attr(data_sub, "track_data")$taxon_canonical_name))
+  }
   
-  summary(hex_sum)
+  
+  cat(str(hex_sum))
+  # cat(str(wrap_cells))
   
   # add counts to cells
-  # wrap_cells$count <- NA
   wrap_cells$count <- hex_sum$count[match(wrap_cells$seqnum, hex_sum$seqnum)]
   wrap_cells$Nind <- hex_sum$Nind[match(wrap_cells$seqnum, hex_sum$seqnum)]
   wrap_cells$Nspp <- hex_sum$Nspp[match(wrap_cells$seqnum, hex_sum$seqnum)]
   
-  summary(wrap_cells)
-  
-  # remove empty cells for faster loading
-  gw_map <- na.omit(wrap_cells)
-  
-  # write out shapefile
-  # st_write(wrap_cells, paste0("output/wrap_nona_res6full-", Sys.time(), ".shp"),
-  #          driver = "ESRI Shapefile")
   
   
   
+  ## remove empty cells for faster loading
+  wrap_cells %<>% na.omit
   
+    #### plot with Mapview ####
   
-  #### plot with Mapview ####
-  
-  ### each layer in separate mapview() function call,
-  ### then add them together!
-  
-  # TODO: use this for breaks  (evenly spaced on log scale)
-  # pretty(log(gw_map$Nspp), n=7)|>exp()|>round()|>unique()
+  ### each layer needs separate mapview() function call, then add
   
   # setup & locations
-  widget <- mapview(gw_map, # R object
+  widget <- mapview(wrap_cells, # R object
                     zcol="count", # column -> layer
                     layer.name="Daily locations",
-                    # at=10^(0:6), # breakpoints for scale
-                    at=(10^(pretty(log10(gw_map$count), n=7))|>round()|>unique()),
-                    color=NULL, # polygon borders
-                    map.types=c("OpenStreetMap", "Esri.WorldImagery")) + # basemaps
-    
+                    # # breakpoints for scale
+                    at=(10^(pretty(log10(wrap_cells$count), n=7)) |> round() |>unique()),
+                    color="#FFFFFF00", # polygon borders
+                    map.types=c("OpenStreetMap", "Esri.WorldImagery") # basemaps
+                    ) + 
+
     # individuals
-    mapview(gw_map, zcol="Nind", color=NULL, layer.name="Individuals",
-            at=(pretty(log(gw_map$Nind), n=7)|>exp()|>round()|>unique()),
+    mapview(wrap_cells, zcol="Nind", color="#FFFFFF00", layer.name="Individuals",
+            at=(pretty(log(wrap_cells$Nind), n=7) |> exp() |> round() |> unique()),
             hide=T) + # don't show initially
-    
+
     # species
-    mapview(gw_map, zcol="Nspp", color=NULL, hide=T, layer.name="Species",
-            at=(pretty(log(gw_map$Nspp), n=7)|>exp()|>round()|>unique()))
+    mapview(wrap_cells, zcol="Nspp", color="#FFFFFF00", hide=T, layer.name="Species",
+            at=(pretty(log(wrap_cells$Nspp), n=7) |> exp() |> round() |> unique()))
   
   
-  mapshot(widget, url = appArtifactPath(paste0("map", gridsize, ".html")))
+  # save html widget of map as artefact
+  mapshot(widget, url = appArtifactPath("map.html"))
   
-  return(gw_map)
+
+  # output 
+  return(data)
   
-# }
+}

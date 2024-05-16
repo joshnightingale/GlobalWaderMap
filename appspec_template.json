@@ -2,48 +2,42 @@
   "version": "1.2",
   "settings": [
     {
-      "id": "gridsize",
-      "name": "Size of hex grid",
-      "description": "Insert grid size setting",
-      "defaultValue": 5,
+      "id": "sdk",
+      "name": "The name of the MoveApps SDK",
+      "description": "Showcase requesting a string input from the users of your app.",
+      "defaultValue": "MoveApps SDK",
+      "type": "STRING"
+    },
+    {
+      "id": "year",
+      "name": "The year",
+      "description": "Insert description for the year setting setting",
+      "defaultValue": 2022,
       "type": "INTEGER"
     },
     {
-      "id": "map",
-      "name": "Background map",
-      "description": "You can personalize the app by providing a map",
+      "id": "auxiliary-file-a",
+      "name": "Personalization",
+      "description": "You can personalize the app by providing a file",
       "type": "USER_FILE"
     }
   ],
   "dependencies": {
     "R": [
       {
-        "name": "sf"
-      },
-      {
-        "name": "dggridR"
-      },
-      {
-        "name": "plyr"
-      },
-      {
-        "name": "magrittr"
+        "name": "lubridate"
       },
       {
         "name": "move2"
-      },
-      {
-        "name": "mapview"
       }
     ]
   },
   "providedAppFiles": [
     {
-      "settingId": "map",
-      "from": "data/auxiliary/user-files/provided-app-files/map/world.gpkg"
+      "settingId": "auxiliary-file-a",
+      "from": "data/auxiliary/user-files/provided-app-files/auxiliary-file-a/sample.txt"
     }
   ],
-  "createsArtifacts": true,
   "license": {
     "key": "MIT"
   },
@@ -54,10 +48,10 @@
   ],
   "people": [
     {
-      "firstName": "Josh",
+      "firstName": "Charles",
       "middleInitials": null,
-      "lastName": "Nightingale",
-      "email": "",
+      "lastName": "Darwin",
+      "email": "creator@example.com",
       "roles": [
         "author",
         "creator"
