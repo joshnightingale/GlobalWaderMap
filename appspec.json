@@ -1,5 +1,5 @@
 {
-  "version": "1.2",
+  "version": "0.1",
   "settings": [
     {
       "id": "gridsize",
@@ -49,8 +49,8 @@
   },
   "language": "eng",
   "keywords": [
-    "example",
-    "template"
+    "map",
+    "summary"
   ],
   "people": [
     {
@@ -62,22 +62,22 @@
         "author",
         "creator"
       ],
-      "orcid": null,
-      "affiliation": null,
+      "orcid": 0000-0002-1188-7773,
+      "affiliation": "University of Iceland",
       "affiliationRor": null
     }
   ],
   "funding": [
     {
-      "name": "funder name",
-      "comment": "grant for App"
+      "name": "Rannís: Icelandic Centre for Research",
+      "comment": "Funder of Global Wader project."
     }
   ],
   "references": [
     {
       "type": "IsDescribedBy",
-      "note": "Darwin, C. 1900. The creation. Journal XY. 1-2",
-      "url": "https://anylink.xyz"
+      "note": "Global Wader",
+      "url": "https://www.globalwader.org"
     }
   ]
 }
