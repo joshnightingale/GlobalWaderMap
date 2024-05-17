@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "1.2",
   "settings": [
     {
       "id": "gridsize",
@@ -62,7 +62,7 @@
         "author",
         "creator"
       ],
-      "orcid": "0000-0002-1188-7773"",
+      "orcid": "0000-0002-1188-7773",
       "affiliation": "University of Iceland",
       "affiliationRor": null
     }
@@ -77,7 +77,8 @@
     {
       "type": "IsDescribedBy",
       "note": "Global Wader",
-      "url": "https://www.globalwader.org"
+      "url": "https://www.globalwader.org",
+      "documentation": "https://www.globalwader.org"
     }
   ]
 }
