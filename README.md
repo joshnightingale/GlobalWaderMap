@@ -1,4 +1,4 @@
-# Hex Grid Summary *
+# Hex Grid Summary
 
 MoveApps
 
