@@ -13,7 +13,7 @@ Function to summarise large amounts of tracking data on a hexagonal grid, includ
 Originally intended for plotting the [Global Wader](https://www.globalwader.org) database.
 
 ### Input data
-Tracking data in move2 format. Optionally, a background map area.
+Tracking data in move2 format.
 
 ### Output data
 move2 object. Interactive htmlwidget map as .html artefact.

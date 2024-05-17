@@ -12,3 +12,4 @@ RFunction_template.R
 appspec_template.json
 developer_README.md
 *.html
+GlobalWaderMap.Rproj

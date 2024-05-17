@@ -1,11 +1,5 @@
 #### hex1.R port ####
 
-## TO DO
-## Input of data (& format - move2)
-## Input of user-selected resolution
-## Output format (move2?)
-
-
 #### packages ####
 library(move2)
 library(magrittr)
@@ -14,11 +8,7 @@ library(dggridR)
 library(mapview)
 
 
-rFunction = function(gridsize, data) {
-  
-  #### load saved world map ####
-  world <- st_read(getAuxiliaryFilePath("map"))
-  
+rFunction = function(gridsize=5, data) {
   
   #### make grid system ####
   # see https://github.com/r-barnes/dggridR for grid sizes etc.
@@ -27,7 +17,7 @@ rFunction = function(gridsize, data) {
   
   #### return hex cells ####
   
-  ## needs shapefile of data extent
+  ## dgshptogrid() needs shapefile of data extent
   bbox_shp <- st_bbox(data) %>% st_as_sfc() # return
   st_write(obj = bbox_shp, dsn = Sys.getenv(x = "APP_ARTIFACTS_DIR"), 
            layer = "bbox.shp", driver = "ESRI Shapefile", append=F) # save
@@ -45,13 +35,13 @@ rFunction = function(gridsize, data) {
   coords <- st_coordinates(data)
   data$seqnum <- dgGEO_to_SEQNUM(hex, coords[,1], coords[,2])$seqnum
   
-  cat(str( subset(data, seqnum==data$seqnum[1])  ))
   
   #### summarise cell contents ####
   
   ## empty data frame for results
   hex_sum <- data.frame(seqnum=unique(data$seqnum), 
                         count=NA, Nind=NA, Nspp=NA)
+  
   
   ## loop through each cell (seqnum) & extract summaries
   for (ii in 1:nrow(hex_sum) ) {
@@ -74,7 +64,7 @@ rFunction = function(gridsize, data) {
   
   #### plot with Mapview ####
   
-  ## each layer needs separate mapview() function call, then add
+  ## each layer needs separate mapview() function call, added together
   
   # setup & locations
   widget <- mapview(wrap_cells, # R object

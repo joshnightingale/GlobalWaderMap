@@ -7,12 +7,6 @@
       "description": "Insert grid size setting",
       "defaultValue": 5,
       "type": "INTEGER"
-    },
-    {
-      "id": "map",
-      "name": "Background map",
-      "description": "You can personalize the app by providing a map",
-      "type": "USER_FILE"
     }
   ],
   "dependencies": {
@@ -36,8 +30,7 @@
   },
   "providedAppFiles": [
     {
-      "settingId": "map",
-      "from": "data/auxiliary/user-files/provided-app-files/map/world.gpkg"
+      
     }
   ],
   "createsArtifacts": true,
