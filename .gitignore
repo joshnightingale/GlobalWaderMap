@@ -3,9 +3,12 @@
 .RData
 .Ruserdata
 .DS_Store
+.Rproj
 data/output/**
+data/raw/**
 !data/output/.keep
 tests/testthat/plot.png
 RFunction_template.R
-
+appspec_template.json
+developer_README.md
 *.html
