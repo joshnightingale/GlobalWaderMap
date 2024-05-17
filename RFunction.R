@@ -7,7 +7,6 @@
 
 
 #### packages ####
-library(plyr)
 library(move2)
 library(magrittr)
 library(sf)
@@ -49,17 +48,12 @@ rFunction = function(gridsize, data) {
   cat(str( subset(data, seqnum==data$seqnum[1])  ))
   
   #### summarise cell contents ####
-  # hex_sum <- ddply(data, .(seqnum), \(x) {
-  #   data.frame(
-  #     count=nrow(x),
-  #     Nind = length(unique(x$track_id))#,
-  #     # Nspp = length(unique(x$taxon_canonical_name))
-  #   ) %>% return()
-  # })
   
-  
+  ## empty data frame for results
   hex_sum <- data.frame(seqnum=unique(data$seqnum), 
                         count=NA, Nind=NA, Nspp=NA)
+  
+  ## loop through each cell (seqnum) & extract summaries
   for (ii in 1:nrow(hex_sum) ) {
     data_sub <- subset(data, seqnum==hex_sum$seqnum[ii])
     hex_sum$count[ii] <- nrow(data_sub)
@@ -68,23 +62,19 @@ rFunction = function(gridsize, data) {
   }
   
   
-  cat(str(hex_sum))
-  # cat(str(wrap_cells))
-  
-  # add counts to cells
+  ## add counts to cells
   wrap_cells$count <- hex_sum$count[match(wrap_cells$seqnum, hex_sum$seqnum)]
   wrap_cells$Nind <- hex_sum$Nind[match(wrap_cells$seqnum, hex_sum$seqnum)]
   wrap_cells$Nspp <- hex_sum$Nspp[match(wrap_cells$seqnum, hex_sum$seqnum)]
   
   
-  
-  
   ## remove empty cells for faster loading
   wrap_cells %<>% na.omit
   
-    #### plot with Mapview ####
   
-  ### each layer needs separate mapview() function call, then add
+  #### plot with Mapview ####
+  
+  ## each layer needs separate mapview() function call, then add
   
   # setup & locations
   widget <- mapview(wrap_cells, # R object
