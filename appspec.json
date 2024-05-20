@@ -4,7 +4,7 @@
     {
       "id": "gridsize",
       "name": "Size of hex grid",
-      "description": "Insert grid size setting",
+      "description": "Grid size: integer from 1 (largest cells) to 20 (smallest). See table at https://github.com/r-barnes/dggridR",
       "defaultValue": 5,
       "type": "INTEGER"
     }
@@ -25,6 +25,9 @@
       },
       {
         "name": "mapview"
+      },
+      {
+        "name": "webshot"
       }
     ]
   },

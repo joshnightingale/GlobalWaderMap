@@ -6,6 +6,7 @@ library(magrittr)
 library(sf)
 library(dggridR)
 library(mapview)
+library(webshot)
 
 
 rFunction = function(gridsize=5, data) {
