@@ -37,6 +37,7 @@ rFunction = function(gridsize=5, data) {
   data$seqnum <- dgGEO_to_SEQNUM(hex, coords[,1], coords[,2])$seqnum
   
   
+  
   #### summarise cell contents ####
   
   ## empty data frame for results
@@ -61,6 +62,7 @@ rFunction = function(gridsize=5, data) {
   
   ## remove empty cells for faster loading
   wrap_cells %<>% na.omit
+  
   
   
   #### plot with Mapview ####
@@ -88,9 +90,18 @@ rFunction = function(gridsize=5, data) {
   
   
   # save html widget of map as artefact
-  mapshot(widget, url = appArtifactPath("map.html"))
+  mapshot(widget, url = appArtifactPath("map.html"),
+          selfcontained = TRUE)
   
 
+  ## compress html dependencies - not needed
+  # zip::zip(zipfile = appArtifactPath("map_files.zip"),
+  #          files=appArtifactPath("map_files"), mode="mirror")
+
+  # remove directory created by mapshot/webshot
+  unlink(appArtifactPath("map_files"), recursive = T)
+  
+  
   # output 
   return(data)
   
