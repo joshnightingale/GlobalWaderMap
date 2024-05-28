@@ -70,23 +70,24 @@ rFunction = function(gridsize=5, data) {
   ## each layer needs separate mapview() function call, added together
   
   # setup & locations
-  widget <- mapview(wrap_cells, # R object
-                    zcol="count", # column -> layer
-                    layer.name="Daily locations",
-                    # # breakpoints for scale
-                    at=(10^(pretty(log10(wrap_cells$count), n=7)) |> round() |>unique()),
-                    color="#FFFFFF00", # polygon borders
-                    map.types=c("OpenStreetMap", "Esri.WorldImagery") # basemaps
-                    ) + 
-
+  widget <- (mapview(wrap_cells, # R object
+                     zcol="count", # column -> layer
+                     layer.name="Daily locations",
+                     # # breakpoints for scale
+                     at=(10^(pretty(log10(wrap_cells$count), n=7)) |> round() |>unique()),
+                     color="#FFFFFF00", # polygon borders
+                     map.types=c("OpenStreetMap", "Esri.WorldImagery") # basemaps
+  ) + 
+    
     # individuals
     mapview(wrap_cells, zcol="Nind", color="#FFFFFF00", layer.name="Individuals",
             at=(pretty(log(wrap_cells$Nind), n=7) |> exp() |> round() |> unique()),
             hide=T) + # don't show initially
-
+    
     # species
     mapview(wrap_cells, zcol="Nspp", color="#FFFFFF00", hide=T, layer.name="Species",
             at=(pretty(log(wrap_cells$Nspp), n=7) |> exp() |> round() |> unique()))
+  ) %>% removeMapJunk(junk = "homeButton")
   
   
   # save html widget of map as artefact
@@ -100,6 +101,10 @@ rFunction = function(gridsize=5, data) {
 
   # remove directory created by mapshot/webshot
   unlink(appArtifactPath("map_files"), recursive = T)
+  
+  # remove shapefile
+  paste0("data/output/", grep("bbox", list.files("data/output/") , 
+         value = T)) %>% unlink
   
   
   # output 
