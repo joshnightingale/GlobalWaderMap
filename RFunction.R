@@ -1,5 +1,3 @@
-#### hex1.R port ####
-
 #### packages ####
 library(move2)
 library(magrittr)
@@ -55,9 +53,9 @@ rFunction = function(gridsize=5, data) {
   
   
   ## add counts to cells
-  wrap_cells$count <- hex_sum$count[match(wrap_cells$seqnum, hex_sum$seqnum)]
-  wrap_cells$Nind <- hex_sum$Nind[match(wrap_cells$seqnum, hex_sum$seqnum)]
-  wrap_cells$Nspp <- hex_sum$Nspp[match(wrap_cells$seqnum, hex_sum$seqnum)]
+  wrap_cells$Locations <- hex_sum$count[match(wrap_cells$seqnum, hex_sum$seqnum)]
+  wrap_cells$Individuals <- hex_sum$Nind[match(wrap_cells$seqnum, hex_sum$seqnum)]
+  wrap_cells$Species <- hex_sum$Nspp[match(wrap_cells$seqnum, hex_sum$seqnum)]
   
   
   ## remove empty cells for faster loading
@@ -71,23 +69,26 @@ rFunction = function(gridsize=5, data) {
   
   # setup & locations
   widget <- (mapview(wrap_cells, # R object
-                     zcol="count", # column -> layer
+                     zcol="Locations", # column -> layer
                      layer.name="Daily locations",
                      # # breakpoints for scale
-                     at=(10^(pretty(log10(wrap_cells$count), n=7)) |> round() |>unique()),
+                     at=(10^(pretty(log10(wrap_cells$Locations), n=7)) |> round() |>unique()),
                      color="#FFFFFF00", # polygon borders
-                     map.types=c("OpenStreetMap", "Esri.WorldImagery") # basemaps
-  ) + 
+                     popup = leafpop::popupTable(wrap_cells, # popup attribute table
+                                                 zcol=c("Locations", "Individuals", "Species"),
+                                                 row.numbers = FALSE, feature.id = FALSE),
+                     map.types=c("OpenStreetMap", "Esri.WorldImagery"), # basemap
+                     hide=F) + # hide all layers but the first
     
     # individuals
-    mapview(wrap_cells, zcol="Nind", color="#FFFFFF00", layer.name="Individuals",
-            at=(pretty(log(wrap_cells$Nind), n=7) |> exp() |> round() |> unique()),
+    mapview(wrap_cells, zcol="Individuals", color="#FFFFFF00", layer.name="Individuals",
+            at=(pretty(log(wrap_cells$Individuals), n=7) |> exp() |> round() |> unique()),
             hide=T) + # don't show initially
     
     # species
-    mapview(wrap_cells, zcol="Nspp", color="#FFFFFF00", hide=T, layer.name="Species",
-            at=(pretty(log(wrap_cells$Nspp), n=7) |> exp() |> round() |> unique()))
-  ) %>% removeMapJunk(junk = "homeButton")
+    mapview(wrap_cells, zcol="Species", color="#FFFFFF00", layer.name="Species",
+            at=(pretty(log(wrap_cells$Species), n=7) |> exp() |> round() |> unique()), 
+            hide=T)) %>% removeMapJunk(junk = "homeButton") 
   
   
   # save html widget of map as artefact

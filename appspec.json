@@ -27,6 +27,9 @@
         "name": "mapview"
       },
       {
+        "name": "leafpop"
+      },
+      {
         "name": "webshot"
       }
     ]
