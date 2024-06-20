@@ -83,11 +83,17 @@ rFunction = function(gridsize=5, data) {
     # individuals
     mapview(wrap_cells, zcol="Individuals", color="#FFFFFF00", layer.name="Individuals",
             at=(pretty(log(wrap_cells$Individuals), n=7) |> exp() |> round() |> unique()),
+            popup = leafpop::popupTable(wrap_cells, # popup attribute table
+                                        zcol=c("Locations", "Individuals", "Species"),
+                                        row.numbers = FALSE, feature.id = FALSE),
             hide=T) + # don't show initially
     
     # species
     mapview(wrap_cells, zcol="Species", color="#FFFFFF00", layer.name="Species",
             at=(pretty(log(wrap_cells$Species), n=7) |> exp() |> round() |> unique()), 
+            popup = leafpop::popupTable(wrap_cells, # popup attribute table
+                                        zcol=c("Locations", "Individuals", "Species"),
+                                        row.numbers = FALSE, feature.id = FALSE),
             hide=T)) %>% removeMapJunk(junk = "homeButton") 
   
   
@@ -96,15 +102,13 @@ rFunction = function(gridsize=5, data) {
           selfcontained = TRUE)
   
 
-  ## compress html dependencies - not needed
-  # zip::zip(zipfile = appArtifactPath("map_files.zip"),
-  #          files=appArtifactPath("map_files"), mode="mirror")
-
   # remove directory created by mapshot/webshot
   unlink(appArtifactPath("map_files"), recursive = T)
   
+  
+  ### TODO this should use appArtificatrPath
   # remove shapefile
-  paste0("data/output/", grep("bbox", list.files("data/output/") , 
+  paste0(Sys.getenv(x = "APP_ARTIFACTS_DIR"), grep("bbox", list.files(Sys.getenv(x = "APP_ARTIFACTS_DIR")) , 
          value = T)) %>% unlink
   
   
